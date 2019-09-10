@@ -8,7 +8,7 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
-	"github.com/promethiumchain/go-promethium/ethclient"
+	"github.com/promethiumchain/promethium/ethclient"
 )
 
 var nodeIP = "95.179.178.196"
