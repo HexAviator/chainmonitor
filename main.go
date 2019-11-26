@@ -2,9 +2,11 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/gorilla/mux"
@@ -45,8 +47,39 @@ func main() {
 	printStartMessage()
 	r := mux.NewRouter()
 	r.HandleFunc("/", printPage)
+	r.HandleFunc("/api", printJSON)
 	http.Handle("/", r)
 	log.Fatal(http.ListenAndServe(":8080", nil))
+}
+
+// Return represents the struct of the data
+type Return struct {
+	BlockNumber string `json:"blockNumber"`
+	BlockTime   string `json:"blockTime"`
+	Difficulty  string `json:"difficulty"`
+	Hashrate    string `json:"hashrate"`
+	NrOfTxs     string `json:"nrOfTxs"`
+	Winner      string `json:"winner"`
+	Info        string `json:"info"`
+}
+
+func printJSON(w http.ResponseWriter, r *http.Request) {
+	bln, blt, diff, hsrate, nrOfTxs, winner, info := connect()
+	r := Return{
+		bln,
+		blt,
+		diff,
+		hsrate,
+		nrOfTxs,
+		winner,
+		info,
+	}
+	rJSON, err := json.Marshal(&r)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	fmt.Fprintf(w, string(rJSON))
 }
 
 func printStartMessage() {
@@ -82,5 +115,4 @@ func printPage(w http.ResponseWriter, req *http.Request) {
 
 func percentChange(startValue, endValue int) int {
 	return ((endValue - startValue) / startValue) * 100
-
 }
